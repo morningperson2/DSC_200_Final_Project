@@ -1,9 +1,35 @@
+import pandas as pd
+
 def part1():
     print("Part 1")
     pass
 
+def part1_DS1() -> pd.DataFrame:
+    pass
+
+def part1_DS2() -> pd.DataFrame:
+    pass
+
+def part1_DS3() -> pd.DataFrame:
+    pass
+
+def part1_DS4() -> pd.DataFrame:
+    pass
+
+def part1_DS5() -> pd.DataFrame:
+    pass
+
 def part2():
     print("Part 2")
+    pass
+
+def part2_DS1() -> pd.DataFrame:
+    pass
+
+def part2_DS2() -> pd.DataFrame:
+    pass
+
+def part2_DS3() -> pd.DataFrame:
     pass
 
 
