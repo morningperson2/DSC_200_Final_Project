@@ -34,7 +34,7 @@ def part1_DS3() -> pd.DataFrame:
         column.append(row)
 
     # writing a csv file
-    with open("df1.csv", "w") as wFileObj:
+    with open("ds3.csv", "w") as wFileObj:
         m_writer = writer(wFileObj)
         m_writer.writerows(column)
 
