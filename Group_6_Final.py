@@ -5,7 +5,9 @@ def part1():
     pass
 
 def part1_DS1() -> pd.DataFrame:
-    pass
+    ds1 = pd.read_csv("https://data.chhs.ca.gov/dataset/52e4aa7a-2ea3-4bfd-8cd6-7d653db1ee74/resource/d7f9acfa-b113-4cbc-9abc-91e707efc08a/download/covid19_variants.csv")
+    ds1.to_csv('ds1.csv')
+
 
 def part1_DS2() -> pd.DataFrame:
     pass
