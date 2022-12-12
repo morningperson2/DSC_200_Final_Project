@@ -1,25 +1,38 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import numpy as np
 
 def part1():
     print("Part 1")
+    ds1 = part1_DS1()
+    ds2 = part1_DS2()
+    ds3 = part1_DS3()
+    df = pd.merge(ds1, ds2, how="outer", on="date")
+    df = pd.merge(df, ds3, how="outer", on="date")
+    df.drop_duplicates(inplace=True)
+    df.mask(df == "", inplace=True)
+    df.dropna(axis=0, thresh=5, inplace=True)
+    df.to_csv("group_6_covid.csv", index=False)
     
-    #df = pd.merge(pd.merge(pd.merge(pd.merge(part1_DS1(), part1_DS2(), on="Date"), part1_DS3(), on="Date"), part1_DS4(), on="Date"), part1_DS5(), on="Date")
-    #df.to_csv("group_6_covid.csv")
-
 def part1_DS1() -> pd.DataFrame:
     # varient data
     ds1 = pd.read_csv("https://data.chhs.ca.gov/dataset/52e4aa7a-2ea3-4bfd-8cd6-7d653db1ee74/resource/d7f9acfa-b113-4cbc-9abc-91e707efc08a/download/covid19_variants.csv")
-    ds1.to_csv('ds1.csv')
+    #ds1.to_csv('ds1.csv')
+    return ds1
 
 
 def part1_DS2() -> pd.DataFrame:
     # vaccine progress dashboard
     ds2 = pd.read_csv("https://data.chhs.ca.gov/dataset/e283ee5a-cf18-4f20-a92c-ee94a2866ccd/resource/22b05bf3-16e5-4b2b-a66a-6b035e0cd9f4/download/covid19vaccinesadministeredbyhpiquartile.csv")
-    ds2.to_csv('ds2.csv')
+    ds2.rename(columns={"administered_date":"date"}, inplace=True)
+    #ds2.to_csv('ds2.csv')
+    return ds2
 
 def part1_DS3() -> pd.DataFrame:
+    ds3 = pd.read_excel("https://github.com/thohan88/covid19-nor-data/raw/master/data/04_deaths/deaths_total_fhi.xlsx")
+    ds3.to_csv("ds3.csv", index=False)
+    return ds3
     pass
 
 def part1_DS4() -> pd.DataFrame:
@@ -30,12 +43,9 @@ def part1_DS5() -> pd.DataFrame:
 
 def part2():
     print("Part 2")
-    #df1 = part2_DS1()
-    #df2 = part2_DS2()
-
-    #df1 = df1[df1["job title"].str.contains(["Data", "DATA"]) == True]
     df = pd.merge(part2_DS1(), part2_DS2(), how="outer", on=["job title", "company name", "city", "state"])
     df = df[df["job title"].str.contains("Data|DATA|data") == True]
+    df.drop_duplicates(inplace=True)
     df.to_csv("group_6_dsc_jobs.csv", index=False)
     pass
 
