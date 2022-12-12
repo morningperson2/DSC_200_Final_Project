@@ -1,15 +1,16 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+from csv import writer
 import numpy as np
 
 def part1():
     print("Part 1")
     ds1 = part1_DS1()
     ds2 = part1_DS2()
-    ds3 = part1_DS3()
+    ds4 = part1_DS4()
     df = pd.merge(ds1, ds2, how="outer", on="date")
-    df = pd.merge(df, ds3, how="outer", on="date")
+    df = pd.merge(df, ds4, how="outer", on="date")
     df.drop_duplicates(inplace=True)
     df.mask(df == "", inplace=True)
     df.dropna(axis=0, thresh=5, inplace=True)
@@ -21,7 +22,7 @@ def part1_DS1() -> pd.DataFrame:
     #ds1.to_csv('ds1.csv')
     return ds1
 
-
+# csv
 def part1_DS2() -> pd.DataFrame:
     # vaccine progress dashboard
     ds2 = pd.read_csv("https://data.chhs.ca.gov/dataset/e283ee5a-cf18-4f20-a92c-ee94a2866ccd/resource/22b05bf3-16e5-4b2b-a66a-6b035e0cd9f4/download/covid19vaccinesadministeredbyhpiquartile.csv")
@@ -29,13 +30,30 @@ def part1_DS2() -> pd.DataFrame:
     #ds2.to_csv('ds2.csv')
     return ds2
 
+# api
 def part1_DS3() -> pd.DataFrame:
-    ds3 = pd.read_excel("https://github.com/thohan88/covid19-nor-data/raw/master/data/04_deaths/deaths_total_fhi.xlsx")
-    ds3.to_csv("ds3.csv", index=False)
-    return ds3
-    pass
+    url = "https://api.covidtracking.com/v1/states/ca/daily.json"
+    response = requests.request("GET", url, headers=None, data=[])
+
+    json_file = response.json()
+    print(json_file)
+
+    column = []
+
+    for i in json_file:
+        # you can edit what data we need to merge with other files
+        row = (i["date"], i["state"], i["positive"], i["death"], i["deathIncrease"], i["negativeIncrease"], i["positiveIncrease"], i["positiveCasesViral"])
+        column.append(row)
+
+    # writing a csv file
+    with open("ds3.csv", "w") as wFileObj:
+        m_writer = writer(wFileObj)
+        m_writer.writerows(column)
 
 def part1_DS4() -> pd.DataFrame:
+    ds4 = pd.read_excel("https://github.com/thohan88/covid19-nor-data/raw/master/data/04_deaths/deaths_total_fhi.xlsx")
+    #ds4.to_csv("ds4.csv", index=False)
+    return ds4
     pass
 
 def part1_DS5() -> pd.DataFrame:
