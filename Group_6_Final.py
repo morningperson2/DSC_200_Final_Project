@@ -8,8 +8,14 @@ def part1():
     print("Part 1")
     ds1 = part1_DS1()
     ds2 = part1_DS2()
+    part1_DS3()
+    ds3 = pd.read_csv("ds3.csv")
     ds4 = part1_DS4()
+
+    ds3["date"] = pd.to_datetime(ds3["date"]).dt.strftime('="%m/%d/%Y"')
+
     df = pd.merge(ds1, ds2, how="outer", on="date")
+    df = pd.merge(df, ds3, how="outer", left_on=["date", "area"], right_on=["date", "state"])
     df = pd.merge(df, ds4, how="outer", on="date")
     df.drop_duplicates(inplace=True)
     df.mask(df == "", inplace=True)
@@ -31,14 +37,15 @@ def part1_DS2() -> pd.DataFrame:
     return ds2
 
 # api
-def part1_DS3() -> pd.DataFrame:
+def part1_DS3():
     url = "https://api.covidtracking.com/v1/states/ca/daily.json"
     response = requests.request("GET", url, headers=None, data=[])
 
     json_file = response.json()
-    print(json_file)
+    #print(json_file)
 
     column = []
+    header = ["date", "state", "positive", "deaths", "deathIncrease", "negativeIncrease", "positiveIncrease", "positiveCasesViral"]
 
     for i in json_file:
         # you can edit what data we need to merge with other files
@@ -48,13 +55,13 @@ def part1_DS3() -> pd.DataFrame:
     # writing a csv file
     with open("ds3.csv", "w") as wFileObj:
         m_writer = writer(wFileObj)
+        m_writer.writerow(header)
         m_writer.writerows(column)
 
 def part1_DS4() -> pd.DataFrame:
     ds4 = pd.read_excel("https://github.com/thohan88/covid19-nor-data/raw/master/data/04_deaths/deaths_total_fhi.xlsx")
     #ds4.to_csv("ds4.csv", index=False)
     return ds4
-    pass
 
 def part1_DS5() -> pd.DataFrame:
     pass
@@ -65,7 +72,6 @@ def part2():
     df = df[df["job title"].str.contains("Data|DATA|data") == True]
     df.drop_duplicates(inplace=True)
     df.to_csv("group_6_dsc_jobs.csv", index=False)
-    pass
 
 def part2_DS1() -> pd.DataFrame:
     url= 'https://www.simplyhired.com/search?q=data+science&l=&job=f6OiCClL7m7gOAQ9o5ElmNquyKreuYz_0b-j3kwtgZ4_mb69UV9KQQ'
