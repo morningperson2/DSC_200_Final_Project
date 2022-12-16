@@ -62,11 +62,13 @@ def part1_DS3():
         m_writer.writerow(header)
         m_writer.writerows(column)
 
+# excel
 def part1_DS4() -> pd.DataFrame:
     ds4 = pd.read_excel("https://github.com/thohan88/covid19-nor-data/raw/master/data/04_deaths/deaths_total_fhi.xlsx")
     #ds4.to_csv("ds4.csv", index=False)
     return ds4
 
+# pdf
 def part1_DS5() -> pd.DataFrame:
     name = "National Chart Data _ The COVID Tracking Project.pdf"
     with open(name, "rb") as pdfObject:
