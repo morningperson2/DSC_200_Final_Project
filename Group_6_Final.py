@@ -142,15 +142,16 @@ def part2_DS1() -> pd.DataFrame:
     state=[]
     job_type=[]
 
+    # job title added to list
     for a in soup.find_all('a', class_='SerpJob-link card-link'):
         job_title.append(a.text.strip())
-
+    # salary added to list
     for div in soup.find_all('div', class_=['SerpJob-metaInfoLeft']):
         if div.text == '':
             salary.append('Unknown')
         else:
             salary.append(div.text.strip('Estimated: ').strip('Quick Apply').strip('a year'))
-
+    # company name added to list
     for span in soup.find_all('span', class_='JobPosting-labelWithIcon jobposting-company'):
         company_name.append(span.text.strip())
 
@@ -181,9 +182,11 @@ def part2_DS2() -> pd.DataFrame:
     city= []
     state= []
 
+    # adds company name to list
     for li in soup.find_all('li', class_='react-job-listing'):
         for div in li.find_all('div', class_='d-flex justify-content-between align-items-start'):
             company_name.append(div.text.strip())
+        # adds job title to list
         for a in li.find_all('a', class_='jobLink css-1rd3saf eigr9kq3'):
             for span in a.find_all('span'):
                 job_title.append(span.text.strip())
@@ -205,8 +208,47 @@ def part2_DS2() -> pd.DataFrame:
     return df
 
 def part2_DS3() -> pd.DataFrame:
-    pass
+    url= 'https://jooble.org/SearchResult?ukw=data%20science'
+    html = requests.get(url)
 
+    soup = BeautifulSoup(html.content, "html.parser")
+
+    job_title= []
+    company_name= []
+    city= []
+    state= []
+    qualifications= []
+    
+    # adds job title to list
+    for h2 in soup.find_all('h2', class_='_15V35X'):
+        job_title.append(h2.text.strip())
+    # adds company name to list
+    for div in soup.find_all('div', class_='_3lDiEO'):
+        company_name.append(div.text.strip())
+    for div in soup.find_all('div', class_='caption _2_Ab4T'):
+        location= div.text.strip()
+        # separates city and state
+        if ',' in location:
+            split = (location.split(", "))
+            # adds city data to list
+            city.append(split[0])
+            # adds state data to list
+            state.append(split[1])
+        else:
+            city.append(location)
+            state.append('N/A')
+
+    links=[]
+    # link for all job detail pages are added to links list
+    for h2 in soup.find_all('h2', class_='_15V35X'):
+        for a in h2.find_all('a'):
+            link= a["href"]
+            links.append(link)
+
+    a = ({'job title': job_title, 'company name': company_name, 'city': city, 'state': state, 'qualifications': links})
+    df= pd.DataFrame.from_dict(a, orient='index')
+    df = df.transpose()
+    return df
 
 print("Welcome to the final project!")
 
