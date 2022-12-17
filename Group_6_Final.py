@@ -124,7 +124,7 @@ def part1_DS5() -> pd.DataFrame:
 
 def part2():
     print("Part 2")
-    df = pd.merge(part2_DS1(), part2_DS2(), part2_DS3, how="outer", on=["job title", "company name", "city", "state"])
+    df = pd.merge(part2_DS1(), part2_DS2(), part2_DS3(), how="outer", on=["job title", "company name", "city", "state"])
     df = df[df["job title"].str.contains("Data|DATA|data") == True]
     df.drop_duplicates(inplace=True)
     df.to_csv("group_6_dsc_jobs.csv", index=False)
