@@ -124,7 +124,7 @@ def part1_DS5() -> pd.DataFrame:
 
 def part2():
     print("Part 2")
-    df = pd.merge(part2_DS1(), part2_DS2(), how="outer", on=["job title", "company name", "city", "state"])
+    df = pd.merge(part2_DS1(), part2_DS2(), part2_DS3, how="outer", on=["job title", "company name", "city", "state"])
     df = df[df["job title"].str.contains("Data|DATA|data") == True]
     df.drop_duplicates(inplace=True)
     df.to_csv("group_6_dsc_jobs.csv", index=False)
@@ -141,20 +141,22 @@ def part2_DS1() -> pd.DataFrame:
     city=[]
     state=[]
     job_type=[]
-
-    # job title added to list
+    qualifications=[]
+    type= []
+    
+    # adds job title to list
     for a in soup.find_all('a', class_='SerpJob-link card-link'):
         job_title.append(a.text.strip())
-    # salary added to list
+    # adds salary to list
     for div in soup.find_all('div', class_=['SerpJob-metaInfoLeft']):
         if div.text == '':
-            salary.append('Unknown')
+            salary.append('N/A')
         else:
             salary.append(div.text.strip('Estimated: ').strip('Quick Apply').strip('a year'))
-    # company name added to list
+    # adds compant name to list
     for span in soup.find_all('span', class_='JobPosting-labelWithIcon jobposting-company'):
         company_name.append(span.text.strip())
-
+    
     for span in soup.find_all('span', class_='JobPosting-labelWithIcon jobposting-location'):
         location= span.text.strip()
         # separates city and state
@@ -166,9 +168,37 @@ def part2_DS1() -> pd.DataFrame:
             state.append(split[1])
         else:
             city.append(location)
-            state.append(location)
+            state.append('N/A')
+            
+    # link for all job detail pages are added to links list
+    links=[]
+    for a in soup.find_all('a', class_='SerpJob-link card-link'):
+        link= 'https://www.simplyhired.com' + a["href"]
+        links.append(link)
 
-    df = pd.DataFrame({'job title': job_title, 'company name': company_name, 'salary': salary, 'city': city, 'state': state})
+    for link in links:
+        html2= requests.get(link)
+        soup2= BeautifulSoup(html2.content, 'html.parser')
+        for div in soup2.find_all('div', class_='viewjob-content'):
+            for div in div.find_all('div', class_='viewjob-section viewjob-qualifications viewjob-entities'):
+                # qualifications added to list
+                for ul in div.find_all('ul', class_='Chips'):
+                    a= []
+                    for li in ul.find_all('li', class_='viewjob-qualification'):
+                        a.append(li.text.strip())
+            
+                    qualifications.append(a)
+        # adds job type to list if available
+        try:
+            for div in soup2.find_all('div', class_='viewjob-section'):
+                for span in div.find_all('span', class_='viewjob-labelWithIcon viewjob-jobType'):
+                    type.append(span.text.strip())
+        except:
+            type.append(' ')
+
+    a = ({'job title': job_title, 'company name': company_name, 'salary': salary, 'city': city, 'state': state, 'job type': type, 'qualificiations': qualifications})
+    df= pd.DataFrame.from_dict(a, orient='index')
+    df = df.transpose()
     return df
 
 def part2_DS2() -> pd.DataFrame:
@@ -211,13 +241,13 @@ def part2_DS2() -> pd.DataFrame:
                 salary.append(span.text.strip())
         else:
             salary.append(' ')
-
+    # link for all job detail pages are added to links list
     links=[]
     for a in soup.find_all('a', class_='jobLink css-1rd3saf eigr9kq3'):
         link= 'https://www.glassdoor.com' + a["href"]
         links.append(link)
 
-    a = ({'job title': job_title, 'company name': company_name, 'city': city, 'state': state, 'salary': salary, 'qualificatons': links})
+    a = ({'job title': job_title, 'company name': company_name, 'salary': salary, 'city': city, 'state': state, 'qualificatons': links})
     df= pd.DataFrame.from_dict(a, orient='index')
     df = df.transpose()
     return df
