@@ -181,9 +181,10 @@ def part2_DS2() -> pd.DataFrame:
     company_name= []
     city= []
     state= []
+    salary= []
 
-    # adds company name to list
     for li in soup.find_all('li', class_='react-job-listing'):
+        # adds company name to list
         for div in li.find_all('div', class_='d-flex justify-content-between align-items-start'):
             company_name.append(div.text.strip())
         # adds job title to list
@@ -203,10 +204,24 @@ def part2_DS2() -> pd.DataFrame:
                 else:
                     city.append(location)
                     state.append(location)
+    # adds salary to list
+    for div in soup.find_all('div', class_=['css-19txzrf e14vl8nk0x', 'css-3g3psg pr-xxsm']):
+        if '$' in div.text:
+            for span in div.find_all('span', class_='css-1xe2xww e1wijj242'):
+                salary.append(span.text.strip())
+        else:
+            salary.append(' ')
 
-    df = pd.DataFrame({'job title': job_title, 'company name': company_name, 'city': city, 'state': state})
+    links=[]
+    for a in soup.find_all('a', class_='jobLink css-1rd3saf eigr9kq3'):
+        link= 'https://www.glassdoor.com' + a["href"]
+        links.append(link)
+
+    a = ({'job title': job_title, 'company name': company_name, 'city': city, 'state': state, 'salary': salary, 'qualificatons': links})
+    df= pd.DataFrame.from_dict(a, orient='index')
+    df = df.transpose()
     return df
-
+              
 def part2_DS3() -> pd.DataFrame:
     url= 'https://jooble.org/SearchResult?ukw=data%20science'
     html = requests.get(url)
