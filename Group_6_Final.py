@@ -124,9 +124,15 @@ def part1_DS5() -> pd.DataFrame:
 
 def part2():
     print("Part 2")
-    df = pd.merge(part2_DS1(), part2_DS2(), part2_DS3, how="outer", on=["job title", "company name", "city", "state"])
+    ds1 = part2_DS1()
+    ds2 = part2_DS2()
+
+    ds1["qualifications"] = ds1["qualifications"].apply(tuple)
+    ds2["qualifications"] = ds2["qualifications"].apply(tuple)
+    df = pd.merge(ds1, ds2, how="outer", on=["job title", "company name", "salary", "city", "state", "qualifications"])
+    df = pd.merge(df, part2_DS3(), how='outer', on=["job title", "company name", "city", "state", "qualifications"])
     df = df[df["job title"].str.contains("Data|DATA|data") == True]
-    df.drop_duplicates(inplace=True)
+    #df.drop_duplicates(inplace=True)
     df.to_csv("group_6_dsc_jobs.csv", index=False)
 
 def part2_DS1() -> pd.DataFrame:
@@ -196,9 +202,10 @@ def part2_DS1() -> pd.DataFrame:
         except:
             type.append(' ')
 
-    a = ({'job title': job_title, 'company name': company_name, 'salary': salary, 'city': city, 'state': state, 'job type': type, 'qualificiations': qualifications})
+    a = ({'job title': job_title, 'company name': company_name, 'salary': salary, 'city': city, 'state': state, 'job type': type, 'qualifications': qualifications})
     df= pd.DataFrame.from_dict(a, orient='index')
     df = df.transpose()
+    df.to_csv("1.csv")
     return df
 
 def part2_DS2() -> pd.DataFrame:
@@ -247,9 +254,10 @@ def part2_DS2() -> pd.DataFrame:
         link= 'https://www.glassdoor.com' + a["href"]
         links.append(link)
 
-    a = ({'job title': job_title, 'company name': company_name, 'salary': salary, 'city': city, 'state': state, 'qualificatons': links})
+    a = ({'job title': job_title, 'company name': company_name, 'salary': salary, 'city': city, 'state': state, 'qualifications': links})
     df= pd.DataFrame.from_dict(a, orient='index')
     df = df.transpose()
+    df.to_csv("2.csv")
     return df
               
 def part2_DS3() -> pd.DataFrame:
@@ -293,6 +301,7 @@ def part2_DS3() -> pd.DataFrame:
     a = ({'job title': job_title, 'company name': company_name, 'city': city, 'state': state, 'qualifications': links})
     df= pd.DataFrame.from_dict(a, orient='index')
     df = df.transpose()
+    df.to_csv("3.csv")
     return df
 
 print("Welcome to the final project!")
